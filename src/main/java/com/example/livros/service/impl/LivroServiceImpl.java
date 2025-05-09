@@ -1,5 +1,6 @@
 package com.example.livros.service.impl;
 
+import com.example.livros.exception.NotFoundException;
 import com.example.livros.mapper.LivroMapper;
 import com.example.livros.model.dto.LivroDTO;
 import com.example.livros.model.entity.Livro;
@@ -40,7 +41,7 @@ public class LivroServiceImpl implements LivroService {
     @Override
     public LivroDTO remover(Long id) {
         Livro livro = livroRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Livro não encontrado para remoção."));
+                .orElseThrow(() -> new NotFoundException("Livro não encontrado para remoção."));
         livroRepository.deleteById(id);
         return LivroMapper.toDTO(livro);
     }
