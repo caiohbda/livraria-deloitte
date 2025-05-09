@@ -1,13 +1,12 @@
 package com.example.livros.controller;
 
-import com.example.livros.model.Livro;
-import com.example.livros.repository.LivroRepository;
+import com.example.livros.model.dto.LivroDTO;
+import com.example.livros.service.LivroService;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -15,28 +14,23 @@ import java.util.List;
 @RestController
 @RequestMapping("/livros")
 public class LivroController {
-    private LivroRepository livroRepository;
+
+    @Autowired
+    private LivroService livroService;
 
     @GetMapping("/listar")
-    public List<Livro> listarLivros() {
-        try {
-            return livroRepository.findAll();
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao listar livros");
-        }
+    public ResponseEntity<List<LivroDTO>> listarLivros() {
+        return ResponseEntity.ok(livroService.listarTodos());
     }
 
     @PostMapping("/adicionar")
-    public Livro adicionarLivro(@RequestBody Livro livro) {
-       return livroRepository.save(livro);
+    public ResponseEntity<LivroDTO> adicionarLivro(@RequestBody LivroDTO livroDTO) {
+        LivroDTO salvo = livroService.adicionar(livroDTO);
+        return ResponseEntity.status(201).body(salvo);
     }
 
     @DeleteMapping("/{id}")
-    public void removerLivro(@PathVariable Long id) {
-        if (!livroRepository.existsById(id)) {
-            throw new Error("Livro não encontrado para remoção.");
-        }
-        livroRepository.deleteById(id);
+    public ResponseEntity<LivroDTO> removerLivro(@PathVariable Long id) {
+        return ResponseEntity.ok(livroService.remover(id));
     }
 }
